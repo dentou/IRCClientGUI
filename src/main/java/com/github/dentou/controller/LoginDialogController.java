@@ -78,6 +78,16 @@ public class LoginDialogController extends Controller<String>{
         String userName = userNameField.getText().trim();
         String fullName = fullnameField.getText().trim();
 
+        if (nick.contains(" ") ) {
+            getMainApp().showAlertDialog(AlertType.ERROR, "Login error",
+                    "Nick error", "Nick must not contain space character");
+            return;
+        } else if (userName.contains(" ")) {
+            getMainApp().showAlertDialog(AlertType.ERROR, "Login error",
+                    "User name error", "User name must not contain space character");
+            return;
+        }
+
         MainApp mainApp = super.getMainApp();
         IRCClient ircClient = mainApp.getIrcClient();
 
