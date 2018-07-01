@@ -4,6 +4,7 @@ import com.github.dentou.model.chat.PrivateMessage;
 import com.github.dentou.model.file.FileMetadata;
 import com.github.dentou.utils.FXUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import emoji4j.EmojiUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -107,6 +108,8 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         }
         String sender = privateMessage.getSender();
         String content = privateMessage.getContent();
+        // New
+        content = EmojiUtils.emojify(content);
         this.displayMessage(sender, content);
     }
 
@@ -122,7 +125,8 @@ public class ChatDialogController extends Controller<PrivateMessage>{
             MainWindowController mainWindowController = (MainWindowController) getMainApp().getController();
             mainWindowController.updateChatHistory(chatter,
                     new PrivateMessage(getMainApp().getUser().getNick(), chatter, chatBox.getText()));
-            this.displayMessage(getMainApp().getUser().getNick(), chatBox.getText());
+            // New
+            this.displayMessage(getMainApp().getUser().getNick(), EmojiUtils.emojify(chatBox.getText()));
         }
         chatBox.clear();
         sendButton.setDisable(true);
@@ -151,7 +155,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         long fileSize = selectedFile.length();
 
         System.out.println("File selected for send: " + selectedFile.getAbsolutePath() + ", size in bytes: " + fileSize);
-        FileMetadata fileMetadata = new FileMetadata(Paths.get(selectedFile.getAbsolutePath()), fileSize, 0l,
+        FileMetadata fileMetadata = new FileMetadata(Paths.get(selectedFile.getAbsolutePath()), fileSize, 0L,
                 getMainApp().getUser().getNick(), chatter);
 
         MainWindowController mainWindowController = (MainWindowController) getMainApp().getController();
@@ -203,7 +207,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
 
     protected void displayMessage(String sender, String content) {
 
-        if (sender == "server") {
+        if ("server".equals(sender)) {
             displayNotification(content);
             return;
         }

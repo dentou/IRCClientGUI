@@ -14,7 +14,6 @@
     -mischka: #A3A5A9;
     -waikawa-grey: #636791;
     -heather: #B5C0C6;
-    -heather: #ACB6C0;
 
 }
 
@@ -28,7 +27,7 @@
 .send-message-label {
     -fx-background-color: rgb(102, 102, 255);
     -fx-text-fill: white;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-background-radius: 14px;
     -fx-padding: 5px;
 }
@@ -36,7 +35,7 @@
 .receive-message-label {
     -fx-background-color: rgb(217, 217, 217);
     -fx-text-fill: black;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-background-radius: 14px;
     -fx-padding: 5px;
 }
