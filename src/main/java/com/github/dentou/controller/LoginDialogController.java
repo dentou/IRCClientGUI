@@ -1,21 +1,19 @@
 package com.github.dentou.controller;
 
 import com.github.dentou.MainApp;
-import com.github.dentou.utils.ClientUtils;
 import com.github.dentou.model.chat.IRCClient;
-import com.github.dentou.utils.ClientConstants.Response;
 import com.github.dentou.model.chat.User;
+import com.github.dentou.utils.ClientConstants.Response;
+import com.github.dentou.utils.ClientUtils;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-
-import java.io.IOException;
-import java.util.List;
-
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.MaskerPane;
+
+import java.util.List;
 
 
 public class LoginDialogController extends Controller<String>{
@@ -69,7 +67,7 @@ public class LoginDialogController extends Controller<String>{
     }
 
     @FXML
-    private void onLogin() throws IOException{
+    private void onLogin() {
         if (!isInputValid()) {
             return;
         }
