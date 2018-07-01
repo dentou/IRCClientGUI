@@ -2,6 +2,7 @@ package com.github.dentou.controller;
 
 import com.github.dentou.model.chat.Channel;
 import com.github.dentou.utils.FXUtils;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -66,9 +67,48 @@ public class ChannelDialogController extends ChatDialogController {
             }
         });
 
+        // todo
+        setChannelListViewOption();
+
         channelNameLabel.setText(channel.getName());
         channelTopicLabel.setText(channel.getTopic());
     }
+
+    private void setChannelListViewOption() {
+        channelListView.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>();
+
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem kickItem = new MenuItem();
+            kickItem.setStyle("-fx-text-fill: white;");
+            kickItem.textProperty().bind(Bindings.format("Kick \"%s\"", cell.itemProperty()));
+            kickItem.setOnAction(event -> {
+                // Send KICK request to server.
+                String nick = cell.getItem();
+                if (nick.charAt(0) == '@' || nick.charAt(0) == '+') {
+                    nick = nick.substring(1);
+                }
+                getMainApp().getIrcClient().sendToServer("KICK", " ",
+                        channel.getName(), " ",
+                        nick);
+            });
+
+            contextMenu.getItems().add(kickItem);
+
+            cell.textProperty().bind(cell.itemProperty());
+
+            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    cell.setContextMenu(null);
+                } else {
+                    cell.setContextMenu(contextMenu);
+                }
+            });
+            return cell ;
+        });
+    }
+
 
     @FXML
     private void onLeave() {

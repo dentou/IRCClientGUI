@@ -134,7 +134,7 @@ public class MainApp extends Application {
             @Override
             public void run() {
                 // todo uncomment the following line when done debugging
-                //Platform.runLater(() -> getController().refresh());
+                Platform.runLater(() -> getController().refresh());
             }
         },
         1,

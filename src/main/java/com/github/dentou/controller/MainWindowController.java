@@ -667,6 +667,52 @@ public class MainWindowController extends Controller<String> {
                     }
                     break;
 
+                // Errors
+                case ERR_NOSUCHNICK:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Nick/channel error",
+                            "The requested nick/channel no longer exists",
+                            "Requested nick/channel: " + messageParts.get(3));
+                    break;
+                case ERR_NOSUCHCHANNEL:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "The requested Channel no longer exists",
+                            "Requested Channel: " + messageParts.get(3));
+                    break;
+                case ERR_CANNOTSENDTOCHAN:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "Cannot send to channel", "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_NOTONCHANNEL:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "You are not on that channel!", "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_USERNOTINCHANNEL:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "User not in channel",
+                            "Nick: " + messageParts.get(3) + "\n" + "Channel name: " + messageParts.get(4));
+                    break;
+                case ERR_CHANNELISFULL:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "Channel is full", "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_INVITEONLYCHAN:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "Channel is invite-only", "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_BADCHANNELKEY:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "You entered wrong channel key", "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_CHANOPRIVSNEEDED:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Channel error",
+                            "You are not channel operator to perform the operation",
+                            "Channel name: " + messageParts.get(3));
+                    break;
+                case ERR_UNKNOWNCOMMAND:
+                    getMainApp().showAlertDialog(AlertType.ERROR, "Command error",
+                            "Unknown command", "Command: " + messageParts.get(3));
+                    break;
+
             }
 
         } else { // Relay message
@@ -683,6 +729,11 @@ public class MainWindowController extends Controller<String> {
                 case "PART":
                     channel = messageParts.get(2);
                     processPART(sender, channel);
+                    break;
+                case "KICK":
+                    channel = messageParts.get(2);
+                    String nick = messageParts.get(3);
+                    processKICK(sender, channel, nick);
                     break;
                 case "FILE_SEND":
                     processFILE_SEND(sender, messageParts);
@@ -797,19 +848,36 @@ public class MainWindowController extends Controller<String> {
     }
 
     private void processPART(String sender, String channelName) {
+        boolean blocked = false;
         // todo implement this
         if (getMainApp().getUser().getNick().equals(sender)) {
             Channel channel = allChannelsMap.get(channelName);
             joinedChannelsData.remove(channel);
             //channelsData.add(channel);
+            blocked = true;
         } else {
             //channelMembersMap.get(channelName).remove(sender);
 
         }
         displayMessage(channelName, new PrivateMessage("server", getMainApp().getUser().getNick(),
-                sender + " has left the channel."), true);
+                sender + " has left the channel."), blocked);
         refresh();
+    }
 
+    private void processKICK(String sender, String channelName, String nick) {
+        boolean blocked = false;
+        if (getMainApp().getUser().getNick().equals(nick)) {
+            Channel channel = allChannelsMap.get(channelName);
+            joinedChannelsData.remove(channel);
+            //channelsData.add(channel);
+            blocked = true;
+        } else {
+            //channelMembersMap.get(channelName).remove(sender);
+
+        }
+        displayMessage(channelName, new PrivateMessage("server", getMainApp().getUser().getNick(),
+                sender + " has kicked " + nick + " out of the channel."), blocked);
+        refresh();
     }
 
     private void processFILE_SEND(String sender, List<String> messageParts) {
@@ -1116,7 +1184,6 @@ public class MainWindowController extends Controller<String> {
             System.out.println("Open new chat dialog");
             chatDialogController = this.showChatDialog(chatter);
 
-            chatDialogController.setBlocked(blocked);
 
             activeChatDialog.put(chatter, chatDialogController);
             if (chatHistoryMap.containsKey(chatter)) {
@@ -1128,6 +1195,7 @@ public class MainWindowController extends Controller<String> {
             }
 
         }
+        chatDialogController.setBlocked(blocked);
         if (privateMessage != null) {
             getMainApp().showNotifications("Notification for " + chatter, privateMessage.getContent());
         }
